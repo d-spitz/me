@@ -1,0 +1,112 @@
+.title-bar-text {
+    margin: 0;
+    font: inherit;
+}
+
+body {
+    background: light-dark(linear-gradient(180deg, #1b6ea5 0%, #3d94c7 35%, #a9d4ea 100%),
+            linear-gradient(180deg, #0b2036 0%, #163852 35%, #2c5470 100%));
+    min-height: 100dvh;
+    padding: 2rem 1rem;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+}
+
+.desktop {
+    position: relative;
+    max-width: 60rem;
+    min-height: 42rem;
+    margin: 0 auto;
+}
+
+.desktop>.window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+}
+
+.desktop>.window>.window-body {
+    flex: 1;
+}
+
+.window-body {
+    padding: 0.5rem;
+}
+
+.title-bar {
+    cursor: grab;
+    touch-action: none;
+}
+
+.window.dragging .title-bar {
+    cursor: grabbing;
+}
+
+.window.profile {
+    top: 0;
+    left: 0;
+    width: min(100%, 44rem);
+}
+
+section.window:nth-of-type(1) {
+    top: 17rem;
+    left: 0;
+    width: 17rem;
+}
+
+section.window:nth-of-type(2) {
+    top: 17rem;
+    left: 18.25rem;
+    width: 19rem;
+}
+
+section.window:nth-of-type(3) {
+    top: 17rem;
+    left: 38.5rem;
+    width: 16rem;
+}
+
+.profile .window-body {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.profile img {
+    inline-size: 12rem;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border: 1px solid var(--w7-el-bd, #8e8f8f);
+    flex-shrink: 0;
+}
+
+.profile h1 {
+    margin: 0 0 4px;
+}
+
+.profile p {
+    margin: 4px 0;
+}
+
+@media (max-width: 700px) {
+    .desktop {
+        min-height: 0;
+    }
+
+    .desktop>.window {
+        position: static;
+        width: auto !important;
+        margin-bottom: 1.25rem;
+    }
+
+    .title-bar {
+        cursor: default;
+        touch-action: auto;
+    }
+
+    .window::before {
+        background: none;
+        box-shadow: none;
+    }
+}
