@@ -3,8 +3,22 @@
     font: inherit;
 }
 
+address {
+    font-style: normal;
+}
+
+:root {
+    scrollbar-gutter: stable;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
-    background: light-dark(linear-gradient(180deg, #1b6ea5 0%, #3d94c7 35%, #a9d4ea 100%),
+    background: light-dark(linear-gradient(180deg, #0d5381 0%, #2e6380 35%, #7493a3 100%),
             linear-gradient(180deg, #0b2036 0%, #163852 35%, #2c5470 100%));
     min-height: 100dvh;
     padding: 2rem 1rem;
@@ -15,7 +29,7 @@ body {
 
 .desktop {
     position: relative;
-    max-width: 60rem;
+    max-width: 54.5rem;
     min-height: 42rem;
     margin: 0 auto;
 }
@@ -37,6 +51,7 @@ body {
 .title-bar {
     cursor: grab;
     touch-action: none;
+    user-select: none;
 }
 
 .window.dragging .title-bar {
@@ -46,7 +61,7 @@ body {
 .window.profile {
     top: 0;
     left: 0;
-    width: min(100%, 44rem);
+    width: min(100%, 54.4rem);
 }
 
 section.window:nth-of-type(1) {
@@ -79,16 +94,31 @@ section.window:nth-of-type(3) {
     flex: 1;
 }
 
-li {
+.window-body ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    list-style-type: "▪  ";
+}
+
+.window-body ul ul {
+    margin: 0.4rem 0 0;
+    list-style-type: "▫  ";
+}
+
+.window-body li::marker {
+    color: var(--w7-el-bd-h, #3c7fb1);
+}
+
+.window-body li {
     margin-bottom: 0.4rem;
 }
 
-li:last-child {
+.window-body li:last-child {
     margin-bottom: 0;
 }
 
 .profile img {
-    inline-size: 10rem;
+    inline-size: 12rem;
     aspect-ratio: 1 / 1;
     object-fit: cover;
     border: 1px solid var(--w7-el-bd, #8e8f8f);
