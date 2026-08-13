@@ -7,10 +7,6 @@ address {
     font-style: normal;
 }
 
-:root {
-    scrollbar-gutter: stable;
-}
-
 *,
 *::before,
 *::after {
