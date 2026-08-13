@@ -114,7 +114,7 @@ section.window:nth-of-type(3) {
 }
 
 .profile img {
-    inline-size: 12rem;
+    inline-size: 10rem;
     aspect-ratio: 1 / 1;
     object-fit: cover;
     border: 1px solid var(--w7-el-bd, #8e8f8f);
