@@ -20,7 +20,7 @@
 
 <body>
     <main class="desktop">
-        <header class="window profile" aria-labelledby="name-heading">
+        <header class="window profile" data-window="profile" aria-labelledby="name-heading">
             <div class="title-bar">
                 <div class="title-bar-text">Who Am I</div>
             </div>
@@ -39,7 +39,7 @@
             </div>
         </header>
 
-        <section class="window" aria-labelledby="bio-heading">
+        <section class="window" data-window="bio" aria-labelledby="bio-heading">
             <div class="title-bar">
                 <h2 class="title-bar-text" id="bio-heading">Bio</h2>
             </div>
@@ -53,7 +53,7 @@
             </div>
         </section>
 
-        <section class="window" aria-labelledby="projects-heading">
+        <section class="window" data-window="projects" aria-labelledby="projects-heading">
             <div class="title-bar">
                 <h2 class="title-bar-text" id="projects-heading">Projects</h2>
             </div>
@@ -79,7 +79,7 @@
             </div>
         </section>
 
-        <section class="window" aria-labelledby="links-heading">
+        <section class="window" data-window="links" aria-labelledby="links-heading">
             <div class="title-bar">
                 <h2 class="title-bar-text" id="links-heading">Links</h2>
             </div>
@@ -106,30 +106,36 @@
     <script>
         const STORAGE_KEY = "windows";
         const desktop = document.querySelector(".desktop");
-        const windows = document.querySelectorAll(".desktop > .window");
+        const windows = [...document.querySelectorAll(".desktop > .window")];
         const reset = document.querySelector("#reset");
+        let topZ = 0;
         let saved = load();
-        let topZ = Math.max(1, ...Object.values(saved).map((s) => s.zIndex || 0));
 
+        // Storage is untrusted and outlives the markup: keep only keys that still name a
+        // window, only finite numbers, and renumber the stack so z never creeps upward.
         function load() {
-            try {
-                return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-            } catch {
-                return {};
+            let raw;
+            try { raw = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { }
+            const clean = {};
+            for (const { dataset } of windows) {
+                const { left, top, z } = raw?.[dataset.window] ?? {};
+                if (Number.isFinite(left) && Number.isFinite(top)) clean[dataset.window] = { left, top };
+                if (Number.isFinite(z)) (clean[dataset.window] ??= {}).z = z;
             }
+            Object.values(clean).filter((s) => s.z).sort((a, b) => a.z - b.z).forEach((s) => (s.z = ++topZ));
+            return clean;
         }
 
-        function save(i, state) {
-            saved[i] = { ...saved[i], ...state };
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
-            } catch { }
+        function save(win, state) {
+            saved[win.dataset.window] = { ...saved[win.dataset.window], ...state };
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(saved)); } catch { }
         }
 
-        function focusWindow(win, i) {
-            if (getComputedStyle(win).position !== "absolute") return;
+        function raise(win) {
+            if (getComputedStyle(win).position !== "absolute") return false;
             win.style.zIndex = ++topZ;
-            save(i, { zIndex: topZ });
+            save(win, { z: topZ });
+            return true;
         }
 
         // Freeze the grid into absolute coordinates so windows can be dragged out of it.
@@ -139,61 +145,57 @@
             desktop.style.height = "";
             if (getComputedStyle(desktop).display !== "grid") return;
 
-            const boxes = [...windows].map((win) => ({
-                position: "absolute",
-                left: win.offsetLeft + "px",
-                top: win.offsetTop + "px",
-                width: win.offsetWidth + "px",
-            }));
+            const boxes = windows.map((win) => ({ left: win.offsetLeft, top: win.offsetTop, width: win.offsetWidth }));
             desktop.style.height = desktop.offsetHeight + "px";
-            windows.forEach((win, i) => Object.assign(win.style, boxes[i], saved[i]));
+            windows.forEach((win, i) => {
+                const { left, top, width, z } = { ...boxes[i], ...saved[win.dataset.window] };
+                Object.assign(win.style, { position: "absolute", left: left + "px", top: top + "px", width: width + "px" });
+                if (z) win.style.zIndex = z;
+            });
         }
 
-        pin();
-        addEventListener("resize", pin);
+        // Coalesce to one relayout per frame: pin() reads offsets right after writing styles.
+        const coalesce = (fn) => { let id; return () => { cancelAnimationFrame(id); id = requestAnimationFrame(fn); }; };
 
-        reset.hidden = !Object.values(saved).some((s) => s.left);
+        pin();
+        addEventListener("resize", coalesce(pin));
+
+        reset.hidden = !Object.values(saved).some((s) => s.left != null);
         reset.addEventListener("click", () => {
             localStorage.removeItem(STORAGE_KEY);
             saved = {};
-            topZ = 1;
+            topZ = 0;
             reset.hidden = true;
             pin();
         });
 
-        windows.forEach((win, i) => {
-            win.addEventListener("mousedown", () => focusWindow(win, i));
-
+        windows.forEach((win) => {
             const titleBar = win.querySelector(".title-bar");
-            titleBar.addEventListener("pointerdown", (e) => {
-                if (e.target.closest(".title-bar-controls")) return;
-                if (getComputedStyle(win).position !== "absolute") return;
+            win.addEventListener("pointerdown", (e) => {
+                if (!raise(win) || !titleBar.contains(e.target) || e.target.closest(".title-bar-controls")) return;
 
-                focusWindow(win, i);
+                const drag = new AbortController();
+                const { signal } = drag;
+                const offsetX = e.clientX - win.offsetLeft;
+                const offsetY = e.clientY - win.offsetTop;
                 win.classList.add("dragging");
-                titleBar.setPointerCapture(e.pointerId);
+                win.setPointerCapture(e.pointerId);
 
-                const startX = e.clientX;
-                const startY = e.clientY;
-                const startLeft = win.offsetLeft;
-                const startTop = win.offsetTop;
+                win.addEventListener("pointermove", (e) => {
+                    win.style.left = e.clientX - offsetX + "px";
+                    win.style.top = e.clientY - offsetY + "px";
+                }, { signal });
 
-                function onMove(e) {
-                    win.style.left = startLeft + (e.clientX - startX) + "px";
-                    win.style.top = startTop + (e.clientY - startY) + "px";
+                // pointercancel too, or an interrupted gesture strands .dragging and leaks
+                // the move listener. Capture is released implicitly by both events.
+                for (const type of ["pointerup", "pointercancel"]) {
+                    win.addEventListener(type, () => {
+                        win.classList.remove("dragging");
+                        save(win, { left: win.offsetLeft, top: win.offsetTop });
+                        reset.hidden = false;
+                        drag.abort();
+                    }, { signal });
                 }
-
-                function onUp(e) {
-                    save(i, { left: win.style.left, top: win.style.top });
-                    reset.hidden = false;
-                    win.classList.remove("dragging");
-                    titleBar.releasePointerCapture(e.pointerId);
-                    titleBar.removeEventListener("pointermove", onMove);
-                    titleBar.removeEventListener("pointerup", onUp);
-                }
-
-                titleBar.addEventListener("pointermove", onMove);
-                titleBar.addEventListener("pointerup", onUp);
             });
         });
     </script>
