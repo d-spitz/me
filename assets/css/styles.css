@@ -86,7 +86,7 @@ section.window:nth-of-type(3) {
 }
 
 .profile .window-body>div {
-    min-width: min(100%, 12rem);
+    min-width: min(100%, 10rem);
     flex: 1;
 }
 
@@ -114,7 +114,7 @@ section.window:nth-of-type(3) {
 }
 
 .profile img {
-    inline-size: 10rem;
+    inline-size: min(10rem, 100%);
     aspect-ratio: 1 / 1;
     object-fit: cover;
     border: 1px solid var(--w7-el-bd, #8e8f8f);
