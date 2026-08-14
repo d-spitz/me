@@ -57,6 +57,21 @@ body {
 
 .window.profile {
     grid-column: 1 / -1;
+    z-index: 1;
+}
+
+#reset {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    min-width: 0;
+    padding: 0 .5rem;
+    cursor: pointer;
+}
+
+#reset svg {
+    display: block;
 }
 
 .profile .window-body {
@@ -111,8 +126,6 @@ body {
 }
 
 @media (max-width: 700px) {
-
-    /* Not a grid, so the script leaves the windows in normal flow. */
     .desktop {
         display: block;
         max-width: none;
@@ -120,6 +133,10 @@ body {
 
     .desktop>.window {
         margin-bottom: 1.25rem;
+    }
+
+    #reset {
+        display: none;
     }
 
     .title-bar {

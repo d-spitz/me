@@ -92,12 +92,21 @@
         </section>
     </main>
 
+    <button id="reset" hidden title="Reset layout" aria-label="Reset layout">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+        </svg>
+    </button>
+
     <script>
         const STORAGE_KEY = "windows";
         const desktop = document.querySelector(".desktop");
         const windows = document.querySelectorAll(".desktop > .window");
-        const saved = load();
-        let topZ = Math.max(0, ...Object.values(saved).map((s) => s.zIndex || 0));
+        const reset = document.querySelector("#reset");
+        let saved = load();
+        let topZ = Math.max(1, ...Object.values(saved).map((s) => s.zIndex || 0));
 
         function load() {
             try {
@@ -109,19 +118,20 @@
 
         function save(i, state) {
             saved[i] = { ...saved[i], ...state };
+            reset.hidden = false;
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
             } catch { }
         }
 
         function focusWindow(win, i) {
+            if (getComputedStyle(win).position !== "absolute") return;
             win.style.zIndex = ++topZ;
             save(i, { zIndex: topZ });
         }
 
-        // Freeze the CSS grid into absolute coordinates so windows can be dragged out
-        // of it, then lay saved positions on top. Measure everything before moving
-        // anything, or we'd be reading a layout we already destroyed.
+        // Freeze the grid into absolute coordinates so windows can be dragged out of it.
+        // Measure everything first — pinning destroys the layout being measured.
         function pin() {
             windows.forEach((win) => win.removeAttribute("style"));
             desktop.style.height = "";
@@ -139,6 +149,15 @@
 
         pin();
         addEventListener("resize", pin);
+
+        reset.hidden = !Object.keys(saved).length;
+        reset.addEventListener("click", () => {
+            localStorage.removeItem(STORAGE_KEY);
+            saved = {};
+            topZ = 1;
+            reset.hidden = true;
+            pin();
+        });
 
         windows.forEach((win, i) => {
             win.addEventListener("mousedown", () => focusWindow(win, i));
@@ -174,8 +193,6 @@
                 titleBar.addEventListener("pointerup", onUp);
             });
         });
-
-        if (!saved[0]) focusWindow(windows[0], 0);
     </script>
 </body>
 
