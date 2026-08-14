@@ -93,7 +93,8 @@
     </main>
 
     <script>
-        const STORAGE_KEY = "window-state";
+        const STORAGE_KEY = "windows";
+        const desktop = document.querySelector(".desktop");
         const windows = document.querySelectorAll(".desktop > .window");
         const saved = load();
         let topZ = Math.max(0, ...Object.values(saved).map((s) => s.zIndex || 0));
@@ -106,8 +107,8 @@
             }
         }
 
-        function save(win, i) {
-            saved[i] = { left: win.style.left, top: win.style.top, zIndex: win.style.zIndex };
+        function save(i, state) {
+            saved[i] = { ...saved[i], ...state };
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
             } catch { }
@@ -115,11 +116,31 @@
 
         function focusWindow(win, i) {
             win.style.zIndex = ++topZ;
-            save(win, i);
+            save(i, { zIndex: topZ });
         }
 
+        // Freeze the CSS grid into absolute coordinates so windows can be dragged out
+        // of it, then lay saved positions on top. Measure everything before moving
+        // anything, or we'd be reading a layout we already destroyed.
+        function pin() {
+            windows.forEach((win) => win.removeAttribute("style"));
+            desktop.style.height = "";
+            if (getComputedStyle(desktop).display !== "grid") return;
+
+            const boxes = [...windows].map((win) => ({
+                position: "absolute",
+                left: win.offsetLeft + "px",
+                top: win.offsetTop + "px",
+                width: win.offsetWidth + "px",
+            }));
+            desktop.style.height = desktop.offsetHeight + "px";
+            windows.forEach((win, i) => Object.assign(win.style, boxes[i], saved[i]));
+        }
+
+        pin();
+        addEventListener("resize", pin);
+
         windows.forEach((win, i) => {
-            Object.assign(win.style, saved[i]);
             win.addEventListener("mousedown", () => focusWindow(win, i));
 
             const titleBar = win.querySelector(".title-bar");
@@ -142,7 +163,7 @@
                 }
 
                 function onUp(e) {
-                    save(win, i);
+                    save(i, { left: win.style.left, top: win.style.top });
                     win.classList.remove("dragging");
                     titleBar.releasePointerCapture(e.pointerId);
                     titleBar.removeEventListener("pointermove", onMove);
