@@ -66,12 +66,15 @@
                             <li>Conversational installation available at the MIT Museum</li>
                         </ul>
                     </li>
-                    <li>Scalable field debunking on social media with LLM persuasion</li>
+                    <li>Scalable field debunking on social media with LLM persuasion — <i><a
+                                href="https://jocelynszhu.github.io/">Jocelyn Zhu</a>, <a
+                                href="https://www.hauselin.com/">Hause Lin</a>, <a
+                                href="https://bowers.cornell.edu/people/david-rand">Dave Rand</a></i></li>
                     <li>Bespoke, informative chatbots on health, such as <a
                             href="https://healthinfobot.com">healthinfobot.com</a></li>
-                    <li>Realtime adaptive flashcard generation to enhance learning with <a
-                            href="https://www.hauselin.com/">Hause Lin</a> and <a href="https://www.deckerlab.com/">Lexi
-                            Decker</a></li>
+                    <li>Realtime adaptive flashcard generation to enhance learning — <i> <a
+                                href="https://www.deckerlab.com/">Lexi Decker</a>, <a
+                                href="https://www.hauselin.com/">Hause Lin</a></i></li>
                 </ul>
             </div>
         </section>
@@ -118,7 +121,6 @@
 
         function save(i, state) {
             saved[i] = { ...saved[i], ...state };
-            reset.hidden = false;
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
             } catch { }
@@ -150,7 +152,7 @@
         pin();
         addEventListener("resize", pin);
 
-        reset.hidden = !Object.keys(saved).length;
+        reset.hidden = !Object.values(saved).some((s) => s.left);
         reset.addEventListener("click", () => {
             localStorage.removeItem(STORAGE_KEY);
             saved = {};
@@ -183,6 +185,7 @@
 
                 function onUp(e) {
                     save(i, { left: win.style.left, top: win.style.top });
+                    reset.hidden = false;
                     win.classList.remove("dragging");
                     titleBar.releasePointerCapture(e.pointerId);
                     titleBar.removeEventListener("pointermove", onMove);
