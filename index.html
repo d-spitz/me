@@ -92,7 +92,70 @@
         </section>
     </main>
 
-    <script src="assets/js/main.js"></script>
+    <script>
+        const STORAGE_KEY = "window-state";
+        const windows = document.querySelectorAll(".desktop > .window");
+        const saved = load();
+        let topZ = Math.max(0, ...Object.values(saved).map((s) => s.zIndex || 0));
+
+        function load() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+            } catch {
+                return {};
+            }
+        }
+
+        function save(win, i) {
+            saved[i] = { left: win.style.left, top: win.style.top, zIndex: win.style.zIndex };
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+            } catch { }
+        }
+
+        function focusWindow(win, i) {
+            win.style.zIndex = ++topZ;
+            save(win, i);
+        }
+
+        windows.forEach((win, i) => {
+            Object.assign(win.style, saved[i]);
+            win.addEventListener("mousedown", () => focusWindow(win, i));
+
+            const titleBar = win.querySelector(".title-bar");
+            titleBar.addEventListener("pointerdown", (e) => {
+                if (e.target.closest(".title-bar-controls")) return;
+                if (getComputedStyle(win).position !== "absolute") return;
+
+                focusWindow(win, i);
+                win.classList.add("dragging");
+                titleBar.setPointerCapture(e.pointerId);
+
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startLeft = win.offsetLeft;
+                const startTop = win.offsetTop;
+
+                function onMove(e) {
+                    win.style.left = startLeft + (e.clientX - startX) + "px";
+                    win.style.top = startTop + (e.clientY - startY) + "px";
+                }
+
+                function onUp(e) {
+                    save(win, i);
+                    win.classList.remove("dragging");
+                    titleBar.releasePointerCapture(e.pointerId);
+                    titleBar.removeEventListener("pointermove", onMove);
+                    titleBar.removeEventListener("pointerup", onUp);
+                }
+
+                titleBar.addEventListener("pointermove", onMove);
+                titleBar.addEventListener("pointerup", onUp);
+            });
+        });
+
+        if (!saved[0]) focusWindow(windows[0], 0);
+    </script>
 </body>
 
 </html>
