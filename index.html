@@ -99,66 +99,14 @@
         </div>
     </main>
 
-    <button id="reset" hidden title="Reopen window" aria-label="Reopen window">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-            <path d="M3 3v5h5" />
-        </svg>
-    </button>
-
     <script>
-        const STORAGE_KEY = "window-pos";
         const win = document.querySelector(".window");
         const titleBar = win.querySelector(".title-bar");
-        const reset = document.querySelector("#reset");
         const [minimize, maximize, close] = win.querySelectorAll(".title-bar-controls button");
         const tabs = win.querySelectorAll('[role="tab"]');
         const panels = win.querySelectorAll('[role="tabpanel"]');
         const isDesktop = () => matchMedia("(min-width: 701px)").matches;
-
-        function isValidPos(p) {
-            return !!p && ["left", "top", "width", "height"].every((k) => Number.isFinite(p[k]));
-        }
-
-        let pos;
-        try {
-            const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
-            pos = isValidPos(parsed) ? parsed : null;
-        } catch { pos = null; }
-
-        function updateResetVisibility() {
-            reset.hidden = !win.classList.contains("closed") && !pos;
-        }
-
-        function setWinPosStyle(p) {
-            Object.assign(win.style, p ? {
-                position: "fixed", left: p.left + "px", top: p.top + "px", margin: "0",
-                maxWidth: "none", width: p.width + "px", height: p.height + "px",
-            } : {
-                position: "", left: "", top: "", margin: "", maxWidth: "", width: "", height: "",
-            });
-        }
-
-        function savePos() {
-            const rect = win.getBoundingClientRect();
-            pos = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
-            setWinPosStyle(pos);
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(pos)); } catch { }
-            updateResetVisibility();
-        }
-
-        function applyPos() {
-            setWinPosStyle(pos && isDesktop() ? pos : null);
-        }
-        applyPos();
-        let wasDesktop = isDesktop();
-        addEventListener("resize", () => {
-            if (isDesktop() === wasDesktop) return;
-            wasDesktop = isDesktop();
-            applyPos();
-        });
-        updateResetVisibility();
+        const POS_PROPS = ["position", "left", "top", "margin", "width", "height"];
 
         function withPointerDrag(el, e, onMove, onEnd) {
             el.setPointerCapture(e.pointerId);
@@ -196,36 +144,26 @@
         minimize.addEventListener("click", () => {
             win.classList.add("minimizing");
             win.addEventListener("transitionend", function onEnd(e) {
-                if (e.target !== win) return;
+                if (e.target !== win || e.propertyName !== "opacity") return;
                 win.removeEventListener("transitionend", onEnd);
                 win.classList.add("closed");
-                updateResetVisibility();
             });
         });
 
+        let preMaximize = null;
         maximize.addEventListener("click", () => {
             const maximized = win.classList.toggle("maximized");
             maximize.setAttribute("aria-label", maximized ? "Restore" : "Maximize");
             if (maximized) {
-                setWinPosStyle(null);
-            } else {
-                applyPos();
+                preMaximize = Object.fromEntries(POS_PROPS.map((p) => [p, win.style[p]]));
+                for (const p of POS_PROPS) win.style[p] = "";
+            } else if (preMaximize) {
+                Object.assign(win.style, preMaximize);
+                preMaximize = null;
             }
         });
 
-        close.addEventListener("click", () => {
-            win.classList.add("closed");
-            updateResetVisibility();
-        });
-
-        reset.addEventListener("click", () => {
-            win.classList.remove("closed", "minimizing", "maximized");
-            maximize.setAttribute("aria-label", "Maximize");
-            pos = null;
-            try { localStorage.removeItem(STORAGE_KEY); } catch { }
-            applyPos();
-            updateResetVisibility();
-        });
+        close.addEventListener("click", () => win.classList.add("closed"));
 
         titleBar.addEventListener("pointerdown", (e) => {
             if (!isDesktop() || win.classList.contains("maximized") || e.target.closest(".title-bar-controls")) return;
@@ -239,21 +177,16 @@
             withPointerDrag(win, e, (e) => {
                 win.style.left = e.clientX - offsetX + "px";
                 win.style.top = e.clientY - offsetY + "px";
-            }, () => {
-                win.classList.remove("dragging");
-                savePos();
-            });
+            }, () => win.classList.remove("dragging"));
         });
 
-        let settled = false;
-        requestAnimationFrame(() => requestAnimationFrame(() => { settled = true; }));
-
-        let resizeTimer;
-        new ResizeObserver(() => {
-            if (!settled || !isDesktop() || win.classList.contains("maximized")) return;
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(savePos, 300);
-        }).observe(win);
+        let wasDesktop = isDesktop();
+        addEventListener("resize", () => {
+            const nowDesktop = isDesktop();
+            if (nowDesktop === wasDesktop) return;
+            wasDesktop = nowDesktop;
+            if (!nowDesktop) for (const p of POS_PROPS) win.style[p] = "";
+        });
     </script>
 </body>
 
