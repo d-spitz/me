@@ -1,6 +1,7 @@
 .title-bar-text {
     margin: 0;
     font: inherit;
+    user-select: none;
 }
 
 address {
@@ -13,6 +14,11 @@ address {
     box-sizing: border-box;
 }
 
+:root {
+    --z-maximized: 10;
+    --z-reset: 20;
+}
+
 body {
     background: light-dark(linear-gradient(180deg, #0d5381 0%, #2e6380 35%, #7493a3 100%),
             linear-gradient(180deg, #0b2036 0%, #163852 35%, #2c5470 100%));
@@ -23,48 +29,95 @@ body {
     margin: 0;
 }
 
+body:has(.window.minimizing) {
+    overflow: hidden;
+}
+
 .desktop {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    gap: 1.25rem;
-    max-width: 54rem;
-    margin: 0 auto;
+    display: flex;
+    justify-content: center;
 }
 
 .desktop>.window {
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    width: min(48rem, 100% - 2rem);
 }
 
-.desktop>.window>.window-body {
-    flex: 1;
+@media (min-width: 701px) {
+    .window {
+        display: flex;
+        flex-direction: column;
+        resize: both;
+        overflow: hidden;
+        min-width: 20rem;
+        min-height: 12rem;
+    }
+
+    .window.maximized {
+        resize: none;
+    }
+
+    .window-body {
+        flex: 1;
+        overflow: auto;
+    }
 }
 
 .window-body {
     padding: 0.5rem;
+    scrollbar-gutter: stable;
 }
 
-.title-bar {
-    cursor: grab;
-    touch-action: none;
-    user-select: none;
+.window.minimizing {
+    transform-origin: bottom left;
+    transform: translate(-25dvw, 50dvh) scale(0.05, 0.02);
+    opacity: 0;
+    transition: transform .35s cubic-bezier(.4, 0, .2, 1), opacity .35s ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .window.minimizing {
+        transition-duration: .01s;
+    }
+}
+
+.title-bar-controls button,
+[role="tab"] {
+    cursor: pointer;
 }
 
 .window.dragging .title-bar {
     cursor: grabbing;
 }
 
-.window.profile {
-    grid-column: 1 / -1;
-    z-index: 1;
+@media (min-width: 701px) {
+    .title-bar {
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+    }
+
+    .window.maximized .title-bar {
+        cursor: default;
+    }
+}
+
+.window.maximized {
+    position: fixed;
+    inset: 1rem;
+    width: auto;
+    z-index: var(--z-maximized);
+}
+
+.window.closed {
+    display: none;
 }
 
 #reset {
     position: fixed;
     top: 1rem;
     right: 1rem;
-    z-index: 9999;
+    z-index: var(--z-reset);
     min-width: 0;
     padding: 0 .5rem;
     cursor: pointer;
@@ -74,39 +127,17 @@ body {
     display: block;
 }
 
-.profile .window-body {
+.profile {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 1rem;
     align-items: flex-start;
+    margin-bottom: 1rem;
 }
 
-.profile .window-body>div {
+.profile>div {
     min-width: min(100%, 10rem);
     flex: 1;
-}
-
-.window-body ul {
-    margin: 0;
-    padding-left: 1.1rem;
-    list-style-type: "▪  ";
-}
-
-.window-body ul ul {
-    margin: 0.4rem 0 0;
-    list-style-type: "▫  ";
-}
-
-.window-body li::marker {
-    color: var(--w7-el-bd-h, #3c7fb1);
-}
-
-.window-body li {
-    margin-bottom: 0.4rem;
-}
-
-.window-body li:last-child {
-    margin-bottom: 0;
 }
 
 .profile img {
@@ -125,28 +156,25 @@ body {
     margin: 4px 0;
 }
 
-/* Below this width CSS owns the layout outright; the drag script detects that by
-   checking whether .desktop is still a grid, so this breakpoint lives only here. */
-@media (max-width: 700px) {
-    .desktop {
-        display: block;
-    }
+[role="tabpanel"] ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    list-style-type: "▪  ";
+}
 
-    .desktop>.window {
-        margin-bottom: 1.25rem;
-    }
+[role="tabpanel"] ul ul {
+    margin: 0.4rem 0 0;
+    list-style-type: "▫  ";
+}
 
-    #reset {
-        display: none;
-    }
+[role="tabpanel"] li::marker {
+    color: var(--w7-el-bd-h, #3c7fb1);
+}
 
-    .title-bar {
-        cursor: default;
-        touch-action: auto;
-    }
+[role="tabpanel"] li {
+    margin-bottom: 0.4rem;
+}
 
-    .window::before {
-        background: none;
-        box-shadow: none;
-    }
+[role="tabpanel"] li:last-child {
+    margin-bottom: 0;
 }

@@ -20,88 +20,86 @@
 
 <body>
     <main class="desktop">
-        <header class="window profile" data-window="profile" aria-labelledby="name-heading">
+        <div class="window active">
             <div class="title-bar">
-                <div class="title-bar-text">Who Am I</div>
-            </div>
-            <div class="window-body">
-                <img src="assets/img/david-spitz.webp" alt="David Spitz">
-                <div>
-                    <h1 id="name-heading">David Spitz</h1>
-                    <p>Research Engineer at MIT Sloan</p>
-                    <p>Working at <a href="https://davidrand-cooperation.com/lab">HCL</a> with <a
-                            href="https://davidrand-cooperation.com/home">Dave Rand</a>
-                    </p>
-                    <hr />
-                    <p>I want to increase the amount of true beliefs in the world and reduce the amount of false
-                        ones</p>
+                <div class="title-bar-text">David Spitz</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize"></button>
+                    <button aria-label="Maximize"></button>
+                    <button aria-label="Close"></button>
                 </div>
             </div>
-        </header>
+            <div class="window-body has-scrollbar">
+                <div class="profile">
+                    <img src="assets/img/david-spitz.webp" alt="David Spitz">
+                    <div>
+                        <h1>David Spitz</h1>
+                        <p>Research Engineer at MIT Sloan</p>
+                        <p>Working at <a href="https://davidrand-cooperation.com/lab">HCL</a> with <a
+                                href="https://davidrand-cooperation.com/home">Dave Rand</a>
+                        </p>
+                        <hr />
+                        <p>I want to increase the amount of true beliefs in the world and reduce the amount of false
+                            ones</p>
+                    </div>
+                </div>
 
-        <section class="window" data-window="bio" aria-labelledby="bio-heading">
-            <div class="title-bar">
-                <h2 class="title-bar-text" id="bio-heading">Bio</h2>
-            </div>
-            <div class="window-body">
-                <ul>
-                    <li>Graduated from UChicago in 2024 with a BS in CS</li>
-                    <li>Studied computer science, formal methods, and philosophical logic</li>
-                    <li>General software development experience across the stack</li>
-                    <li>Believe in tools that do one thing and do it well</li>
-                </ul>
-            </div>
-        </section>
+                <menu role="tablist">
+                    <button role="tab" aria-controls="tab-bio" aria-selected="true">Bio</button>
+                    <button role="tab" aria-controls="tab-projects" tabindex="-1">Projects</button>
+                    <button role="tab" aria-controls="tab-links" tabindex="-1">Links</button>
+                </menu>
 
-        <section class="window" data-window="projects" aria-labelledby="projects-heading">
-            <div class="title-bar">
-                <h2 class="title-bar-text" id="projects-heading">Projects</h2>
-            </div>
-            <div class="window-body">
-                <ul>
-                    <li>
-                        Developed <a href="https://debunkbot.com">debunkbot.com</a> — <i><a
-                                href="https://thcostello.com/">Tom Costello</a>, <a
-                                href="https://davidrand-cooperation.com/home">Dave Rand</a>, <a
-                                href="https://gordonpennycook.com/">Gordon Pennycook</a></i>
-                        <ul>
-                            <li>Also deployed on social media as taggable versions with @grok-like behavior</li>
-                            <li>Conversational installation available at the MIT Museum — <i><a
-                                        href="https://www.hauselin.com/">Hause Lin</a></i></li>
-                            <li>Bespoke, informative chatbots on health, such as <a
-                                    href="https://healthinfobot.com">healthinfobot.com</a> — <i><a
-                                        href="https://henryxu1997.github.io/">Henry Xu</a>, <a
-                                        href="https://www.jangvoelkel.com/">Jan G. Voelkel</a></i></li>
-                        </ul>
-                    </li>
-                    <li>Scalable field debunking on social media with LLM persuasion — <i><a
-                                href="https://jocelynszhu.github.io/">Jocelyn Zhu</a>, <a
-                                href="https://www.hauselin.com/">Hause Lin</a>, <a
-                                href="https://davidrand-cooperation.com/home">Dave Rand</a></i></li>
-                    <li>Realtime adaptive flashcard generation to enhance learning — <i> <a
-                                href="https://www.deckerlab.com/">Lexi Decker</a>, <a
-                                href="https://www.hauselin.com/">Hause Lin</a></i></li>
-                </ul>
-            </div>
-        </section>
-
-        <section class="window" data-window="links" aria-labelledby="links-heading">
-            <div class="title-bar">
-                <h2 class="title-bar-text" id="links-heading">Links</h2>
-            </div>
-            <div class="window-body">
-                <address>
+                <article role="tabpanel" id="tab-bio">
                     <ul>
-                        <li><a href="https://www.linkedin.com/in/david-s-2b78a6215/">LinkedIn</a></li>
-                        <li><a href="https://github.com/d-spitz/">GitHub</a></li>
-                        <li><a href="mailto:dspitz@mit.edu">dspitz@mit.edu</a></li>
+                        <li>Graduated from UChicago in 2024 with a BS in CS</li>
+                        <li>Studied computer science, formal methods, and philosophical logic</li>
+                        <li>General software development experience across the stack</li>
+                        <li>Believe in tools that do one thing and do it well</li>
                     </ul>
-                </address>
+                </article>
+
+                <article role="tabpanel" id="tab-projects" hidden>
+                    <ul>
+                        <li>
+                            Developed <a href="https://debunkbot.com">debunkbot.com</a> — <i><a
+                                    href="https://thcostello.com/">Tom Costello</a>, <a
+                                    href="https://davidrand-cooperation.com/home">Dave Rand</a>, <a
+                                    href="https://gordonpennycook.com/">Gordon Pennycook</a></i>
+                            <ul>
+                                <li>Also deployed on social media as taggable versions with @grok-like behavior</li>
+                                <li>Conversational installation available at the MIT Museum — <i><a
+                                            href="https://www.hauselin.com/">Hause Lin</a></i></li>
+                                <li>Bespoke, informative chatbots on health, such as <a
+                                        href="https://healthinfobot.com">healthinfobot.com</a> — <i><a
+                                            href="https://henryxu1997.github.io/">Henry Xu</a>, <a
+                                            href="https://www.jangvoelkel.com/">Jan G. Voelkel</a></i></li>
+                            </ul>
+                        </li>
+                        <li>Scalable field debunking on social media with LLM persuasion — <i><a
+                                    href="https://jocelynszhu.github.io/">Jocelyn Zhu</a>, <a
+                                    href="https://www.hauselin.com/">Hause Lin</a>, <a
+                                    href="https://davidrand-cooperation.com/home">Dave Rand</a></i></li>
+                        <li>Realtime adaptive flashcard generation to enhance learning — <i> <a
+                                    href="https://www.deckerlab.com/">Lexi Decker</a>, <a
+                                    href="https://www.hauselin.com/">Hause Lin</a></i></li>
+                    </ul>
+                </article>
+
+                <article role="tabpanel" id="tab-links" hidden>
+                    <address>
+                        <ul>
+                            <li><a href="https://www.linkedin.com/in/david-s-2b78a6215/">LinkedIn</a></li>
+                            <li><a href="https://github.com/d-spitz/">GitHub</a></li>
+                            <li><a href="mailto:dspitz@mit.edu">dspitz@mit.edu</a></li>
+                        </ul>
+                    </address>
+                </article>
             </div>
-        </section>
+        </div>
     </main>
 
-    <button id="reset" hidden title="Reset layout" aria-label="Reset layout">
+    <button id="reset" hidden title="Reopen window" aria-label="Reopen window">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
@@ -110,100 +108,152 @@
     </button>
 
     <script>
-        const STORAGE_KEY = "windows";
-        const desktop = document.querySelector(".desktop");
-        const windows = [...document.querySelectorAll(".desktop > .window")];
+        const STORAGE_KEY = "window-pos";
+        const win = document.querySelector(".window");
+        const titleBar = win.querySelector(".title-bar");
         const reset = document.querySelector("#reset");
-        let topZ = 0;
-        let saved = load();
+        const [minimize, maximize, close] = win.querySelectorAll(".title-bar-controls button");
+        const tabs = win.querySelectorAll('[role="tab"]');
+        const panels = win.querySelectorAll('[role="tabpanel"]');
+        const isDesktop = () => matchMedia("(min-width: 701px)").matches;
 
-        // Storage is untrusted and outlives the markup: keep only keys that still name a
-        // window, only finite numbers, and renumber the stack so z never creeps upward.
-        function load() {
-            let raw;
-            try { raw = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { }
-            const clean = {};
-            for (const { dataset } of windows) {
-                const { left, top, z } = raw?.[dataset.window] ?? {};
-                if (Number.isFinite(left) && Number.isFinite(top)) clean[dataset.window] = { left, top };
-                if (Number.isFinite(z)) (clean[dataset.window] ??= {}).z = z;
+        function isValidPos(p) {
+            return !!p && ["left", "top", "width", "height"].every((k) => Number.isFinite(p[k]));
+        }
+
+        let pos;
+        try {
+            const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            pos = isValidPos(parsed) ? parsed : null;
+        } catch { pos = null; }
+
+        function updateResetVisibility() {
+            reset.hidden = !win.classList.contains("closed") && !pos;
+        }
+
+        function setWinPosStyle(p) {
+            Object.assign(win.style, p ? {
+                position: "fixed", left: p.left + "px", top: p.top + "px", margin: "0",
+                maxWidth: "none", width: p.width + "px", height: p.height + "px",
+            } : {
+                position: "", left: "", top: "", margin: "", maxWidth: "", width: "", height: "",
+            });
+        }
+
+        function savePos() {
+            const rect = win.getBoundingClientRect();
+            pos = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+            setWinPosStyle(pos);
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(pos)); } catch { }
+            updateResetVisibility();
+        }
+
+        function applyPos() {
+            setWinPosStyle(pos && isDesktop() ? pos : null);
+        }
+        applyPos();
+        let wasDesktop = isDesktop();
+        addEventListener("resize", () => {
+            if (isDesktop() === wasDesktop) return;
+            wasDesktop = isDesktop();
+            applyPos();
+        });
+        updateResetVisibility();
+
+        function withPointerDrag(el, e, onMove, onEnd) {
+            el.setPointerCapture(e.pointerId);
+            const ac = new AbortController();
+            const { signal } = ac;
+            el.addEventListener("pointermove", onMove, { signal });
+            for (const type of ["pointerup", "pointercancel"]) {
+                el.addEventListener(type, () => { onEnd(); ac.abort(); }, { signal });
             }
-            Object.values(clean).filter((s) => s.z).sort((a, b) => a.z - b.z).forEach((s) => (s.z = ++topZ));
-            return clean;
         }
 
-        function save(win, state) {
-            saved[win.dataset.window] = { ...saved[win.dataset.window], ...state };
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(saved)); } catch { }
+        function selectTab(tab) {
+            for (const t of tabs) {
+                t.setAttribute("aria-selected", t === tab);
+                t.tabIndex = t === tab ? 0 : -1;
+            }
+            for (const panel of panels) panel.hidden = panel.id !== tab.getAttribute("aria-controls");
         }
 
-        function raise(win) {
-            if (getComputedStyle(win).position !== "absolute") return false;
-            win.style.zIndex = ++topZ;
-            save(win, { z: topZ });
-            return true;
-        }
-
-        // Freeze the grid into absolute coordinates so windows can be dragged out of it.
-        // Measure everything first — pinning destroys the layout being measured.
-        function pin() {
-            windows.forEach((win) => win.removeAttribute("style"));
-            desktop.style.height = "";
-            if (getComputedStyle(desktop).display !== "grid") return;
-
-            const boxes = windows.map((win) => ({ left: win.offsetLeft, top: win.offsetTop, width: win.offsetWidth }));
-            desktop.style.height = desktop.offsetHeight + "px";
-            windows.forEach((win, i) => {
-                const { left, top, width, z } = { ...boxes[i], ...saved[win.dataset.window] };
-                Object.assign(win.style, { position: "absolute", left: left + "px", top: top + "px", width: width + "px" });
-                if (z) win.style.zIndex = z;
+        tabs.forEach((tab, i) => {
+            tab.addEventListener("click", () => selectTab(tab));
+            tab.addEventListener("keydown", (e) => {
+                const dir = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+                const next = dir ? tabs[(i + dir + tabs.length) % tabs.length]
+                    : e.key === "Home" ? tabs[0]
+                        : e.key === "End" ? tabs[tabs.length - 1]
+                            : null;
+                if (!next) return;
+                e.preventDefault();
+                next.focus();
+                selectTab(next);
             });
-        }
+        });
 
-        // Coalesce to one relayout per frame: pin() reads offsets right after writing styles.
-        const coalesce = (fn) => { let id; return () => { cancelAnimationFrame(id); id = requestAnimationFrame(fn); }; };
+        minimize.addEventListener("click", () => {
+            win.classList.add("minimizing");
+            win.addEventListener("transitionend", function onEnd(e) {
+                if (e.target !== win) return;
+                win.removeEventListener("transitionend", onEnd);
+                win.classList.add("closed");
+                updateResetVisibility();
+            });
+        });
 
-        pin();
-        addEventListener("resize", coalesce(pin));
+        maximize.addEventListener("click", () => {
+            const maximized = win.classList.toggle("maximized");
+            maximize.setAttribute("aria-label", maximized ? "Restore" : "Maximize");
+            if (maximized) {
+                setWinPosStyle(null);
+            } else {
+                applyPos();
+            }
+        });
 
-        reset.hidden = !Object.values(saved).some((s) => s.left != null);
+        close.addEventListener("click", () => {
+            win.classList.add("closed");
+            updateResetVisibility();
+        });
+
         reset.addEventListener("click", () => {
-            localStorage.removeItem(STORAGE_KEY);
-            saved = {};
-            topZ = 0;
-            reset.hidden = true;
-            pin();
+            win.classList.remove("closed", "minimizing", "maximized");
+            maximize.setAttribute("aria-label", "Maximize");
+            pos = null;
+            try { localStorage.removeItem(STORAGE_KEY); } catch { }
+            applyPos();
+            updateResetVisibility();
         });
 
-        windows.forEach((win) => {
-            const titleBar = win.querySelector(".title-bar");
-            win.addEventListener("pointerdown", (e) => {
-                if (!raise(win) || !titleBar.contains(e.target) || e.target.closest(".title-bar-controls")) return;
+        titleBar.addEventListener("pointerdown", (e) => {
+            if (!isDesktop() || win.classList.contains("maximized") || e.target.closest(".title-bar-controls")) return;
 
-                const drag = new AbortController();
-                const { signal } = drag;
-                const offsetX = e.clientX - win.offsetLeft;
-                const offsetY = e.clientY - win.offsetTop;
-                win.classList.add("dragging");
-                win.setPointerCapture(e.pointerId);
+            const rect = win.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left;
+            const offsetY = e.clientY - rect.top;
+            Object.assign(win.style, { position: "fixed", left: rect.left + "px", top: rect.top + "px", margin: "0" });
+            win.classList.add("dragging");
 
-                win.addEventListener("pointermove", (e) => {
-                    win.style.left = e.clientX - offsetX + "px";
-                    win.style.top = e.clientY - offsetY + "px";
-                }, { signal });
-
-                // pointercancel too, or an interrupted gesture strands .dragging and leaks
-                // the move listener. Capture is released implicitly by both events.
-                for (const type of ["pointerup", "pointercancel"]) {
-                    win.addEventListener(type, () => {
-                        win.classList.remove("dragging");
-                        save(win, { left: win.offsetLeft, top: win.offsetTop });
-                        reset.hidden = false;
-                        drag.abort();
-                    }, { signal });
-                }
+            withPointerDrag(win, e, (e) => {
+                win.style.left = e.clientX - offsetX + "px";
+                win.style.top = e.clientY - offsetY + "px";
+            }, () => {
+                win.classList.remove("dragging");
+                savePos();
             });
         });
+
+        let settled = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => { settled = true; }));
+
+        let resizeTimer;
+        new ResizeObserver(() => {
+            if (!settled || !isDesktop() || win.classList.contains("maximized")) return;
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(savePos, 300);
+        }).observe(win);
     </script>
 </body>
 
