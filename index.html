@@ -24,9 +24,9 @@
             <div class="title-bar">
                 <div class="title-bar-text">David Spitz</div>
                 <div class="title-bar-controls">
-                    <button aria-label="Minimize"></button>
-                    <button aria-label="Maximize"></button>
-                    <button aria-label="Close"></button>
+                    <button aria-label="Minimize" popovertarget="egg"></button>
+                    <button aria-label="Maximize" popovertarget="egg"></button>
+                    <button aria-label="Close" popovertarget="egg"></button>
                 </div>
             </div>
             <div class="window-body has-scrollbar">
@@ -45,12 +45,12 @@
                 </div>
 
                 <menu role="tablist">
-                    <button role="tab" aria-controls="tab-bio" aria-selected="true">Bio</button>
-                    <button role="tab" aria-controls="tab-projects" tabindex="-1">Projects</button>
-                    <button role="tab" aria-controls="tab-links" tabindex="-1">Links</button>
+                    <a role="tab" href="#bio">Bio</a>
+                    <a role="tab" href="#projects">Projects</a>
+                    <a role="tab" href="#links">Links</a>
                 </menu>
 
-                <article role="tabpanel" id="tab-bio">
+                <article role="tabpanel" id="bio">
                     <ul>
                         <li>Graduated from UChicago in 2024 with a BS in CS</li>
                         <li>Studied computer science, formal methods, and philosophical logic</li>
@@ -59,7 +59,7 @@
                     </ul>
                 </article>
 
-                <article role="tabpanel" id="tab-projects" hidden>
+                <article role="tabpanel" id="projects">
                     <ul>
                         <li>
                             Developed <a href="https://debunkbot.com">debunkbot.com</a> — <i><a
@@ -86,7 +86,7 @@
                     </ul>
                 </article>
 
-                <article role="tabpanel" id="tab-links" hidden>
+                <article role="tabpanel" id="links">
                     <address>
                         <ul>
                             <li><a href="https://www.linkedin.com/in/david-s-2b78a6215/">LinkedIn</a></li>
@@ -99,95 +99,27 @@
         </div>
     </main>
 
-    <script>
-        const win = document.querySelector(".window");
-        const titleBar = win.querySelector(".title-bar");
-        const [minimize, maximize, close] = win.querySelectorAll(".title-bar-controls button");
-        const tabs = win.querySelectorAll('[role="tab"]');
-        const panels = win.querySelectorAll('[role="tabpanel"]');
-        const isDesktop = () => matchMedia("(min-width: 701px)").matches;
-        const POS_PROPS = ["position", "left", "top", "margin", "width", "height"];
+    <div id="egg" popover class="window active egg" role="alertdialog" aria-label="Woah">
+        <div class="title-bar">
+            <div class="title-bar-text">WOAH!</div>
+            <div class="title-bar-controls">
+                <button aria-label="Close" popovertarget="egg" popovertargetaction="hide"></button>
+            </div>
+        </div>
+        <div class="window-body has-space egg-body">
+            <div class="egg-message">
+                <svg class="egg-icon" viewBox="0 0 32 32" aria-hidden="true">
+                    <circle cx="16" cy="16" r="15" fill="#d92f24" stroke="#8f1c14" />
+                    <path d="M10 10l12 12M22 10l-12 12" stroke="#fff" stroke-width="3.5" stroke-linecap="round" />
+                    <ellipse cx="16" cy="10" rx="11" ry="7" fill="#fff" opacity=".25" />
+                </svg>
+                <p>You don't enable JavaScript? You are so cool!</p>
+            </div>
+            <button class="egg-ok" popovertarget="egg" popovertargetaction="hide">OK</button>
+        </div>
+    </div>
 
-        function withPointerDrag(el, e, onMove, onEnd) {
-            el.setPointerCapture(e.pointerId);
-            const ac = new AbortController();
-            const { signal } = ac;
-            el.addEventListener("pointermove", onMove, { signal });
-            for (const type of ["pointerup", "pointercancel"]) {
-                el.addEventListener(type, () => { onEnd(); ac.abort(); }, { signal });
-            }
-        }
-
-        function selectTab(tab) {
-            for (const t of tabs) {
-                t.setAttribute("aria-selected", t === tab);
-                t.tabIndex = t === tab ? 0 : -1;
-            }
-            for (const panel of panels) panel.hidden = panel.id !== tab.getAttribute("aria-controls");
-        }
-
-        tabs.forEach((tab, i) => {
-            tab.addEventListener("click", () => selectTab(tab));
-            tab.addEventListener("keydown", (e) => {
-                const dir = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-                const next = dir ? tabs[(i + dir + tabs.length) % tabs.length]
-                    : e.key === "Home" ? tabs[0]
-                        : e.key === "End" ? tabs[tabs.length - 1]
-                            : null;
-                if (!next) return;
-                e.preventDefault();
-                next.focus();
-                selectTab(next);
-            });
-        });
-
-        minimize.addEventListener("click", () => {
-            win.classList.add("minimizing");
-            win.addEventListener("transitionend", function onEnd(e) {
-                if (e.target !== win || e.propertyName !== "opacity") return;
-                win.removeEventListener("transitionend", onEnd);
-                win.classList.add("closed");
-            });
-        });
-
-        let preMaximize = null;
-        maximize.addEventListener("click", () => {
-            const maximized = win.classList.toggle("maximized");
-            maximize.setAttribute("aria-label", maximized ? "Restore" : "Maximize");
-            if (maximized) {
-                preMaximize = Object.fromEntries(POS_PROPS.map((p) => [p, win.style[p]]));
-                for (const p of POS_PROPS) win.style[p] = "";
-            } else if (preMaximize) {
-                Object.assign(win.style, preMaximize);
-                preMaximize = null;
-            }
-        });
-
-        close.addEventListener("click", () => win.classList.add("closed"));
-
-        titleBar.addEventListener("pointerdown", (e) => {
-            if (!isDesktop() || win.classList.contains("maximized") || e.target.closest(".title-bar-controls")) return;
-
-            const rect = win.getBoundingClientRect();
-            const offsetX = e.clientX - rect.left;
-            const offsetY = e.clientY - rect.top;
-            Object.assign(win.style, { position: "fixed", left: rect.left + "px", top: rect.top + "px", margin: "0" });
-            win.classList.add("dragging");
-
-            withPointerDrag(win, e, (e) => {
-                win.style.left = e.clientX - offsetX + "px";
-                win.style.top = e.clientY - offsetY + "px";
-            }, () => win.classList.remove("dragging"));
-        });
-
-        let wasDesktop = isDesktop();
-        addEventListener("resize", () => {
-            const nowDesktop = isDesktop();
-            if (nowDesktop === wasDesktop) return;
-            wasDesktop = nowDesktop;
-            if (!nowDesktop) for (const p of POS_PROPS) win.style[p] = "";
-        });
-    </script>
+    <script src="assets/js/app.js"></script>
 </body>
 
 </html>
